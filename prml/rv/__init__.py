@@ -12,6 +12,8 @@ from prml.rv.uniform import Uniform
 from prml.rv.variational_gaussian_mixture import VariationalGaussianMixture
 
 
+# 특정 디렉터리의 모듈을 *를 이용하여 import할 때에는 다음과 같이 
+# 해당 디렉터리의 __init__.py 파일에 __all__이라는 변수를 설정하고 import할 수 있는 모듈을 정의해 주어야 합니다.
 __all__ = [
     "Bernoulli",
     "BernoulliMixture",
