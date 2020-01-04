@@ -24,8 +24,8 @@ class RidgeRegression(Regression):
             training data dependent variable
         """
 
-        eye = np.eye(np.size(X, 1))
-        self.w = np.linalg.solve(self.alpha * eye + X.T @ X, X.T @ t)
+        eye = np.eye(np.size(X, 1)) # N x N Identity matrix
+        self.w = np.linalg.solve(self.alpha * eye + X.T @ X, X.T @ t) # 선형시스템을 풀어라; 리지 클로즈드 폼 inv(X'X + aI) @ X'y = beta 를 이용해서
 
     def predict(self, X:np.ndarray):
         """

@@ -9,7 +9,7 @@ class LinearRegression(Regression):
     t ~ N(t|X @ w, var)
     """
 
-    def fit(self, X:np.ndarray, t:np.ndarray):
+    def fit(self, X:np.ndarray, t:np.ndarray): # annotations
         """
         perform least squares fitting
 
@@ -20,10 +20,10 @@ class LinearRegression(Regression):
         t : (N,) np.ndarray
             training dependent variable
         """
-        self.w = np.linalg.pinv(X) @ t
-        self.var = np.mean(np.square(X @ self.w - t))
+        self.w = np.linalg.pinv(X) @ t # 유사역행렬 inv(X' @ X) @ X'
+        self.var = np.mean(np.square(X @ self.w - t)) # M
 
-    def predict(self, X:np.ndarray, return_std:bool=False):
+    def predict(self, X:np.ndarray, return_std:bool=False): # annotations
         """
         make prediction given input
 
@@ -43,6 +43,6 @@ class LinearRegression(Regression):
         """
         y = X @ self.w
         if return_std:
-            y_std = np.sqrt(self.var) + np.zeros_like(y)
+            y_std = np.sqrt(self.var) + np.zeros_like(y) # 브로드 캐스팅
             return y, y_std
         return y
