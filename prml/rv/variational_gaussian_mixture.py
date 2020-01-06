@@ -175,3 +175,5 @@ class VariationalGaussianMixture(RandomVariable):
 
     def _pdf(self, X):
         return (self.alpha * self.student_t(X)).sum(axis=-1) / self.alpha.sum()
+
+# TODO January 06, 2020: 나중에 코드분석하자

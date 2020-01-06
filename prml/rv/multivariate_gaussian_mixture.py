@@ -220,3 +220,5 @@ class MultivariateGaussianMixture(RandomVariable):
             posterior probability of cluster
         """
         return self._expectation(X)
+
+# TODO January 06, 2020: 나중에 코드분석하자
