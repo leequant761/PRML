@@ -26,7 +26,7 @@ class Beta(RandomVariable):
         n_ones : int, float, or np.ndarray
             pseudo count of ones
         """
-        super().__init__()
+        super().__init__() # self.parameter = {} 라고 정의
         if not isinstance(n_ones, (int, float, np.number, np.ndarray)):
             raise ValueError(
                 "{} is not supported for n_ones"
@@ -37,14 +37,14 @@ class Beta(RandomVariable):
                 "{} is not supported for n_zeros"
                 .format(type(n_zeros))
             )
-        n_ones = np.asarray(n_ones)
+        n_ones = np.asarray(n_ones) # int나 float이나 np.number나 그냥 np.array로 형변환
         n_zeros = np.asarray(n_zeros)
-        if n_ones.shape != n_zeros.shape:
+        if n_ones.shape != n_zeros.shape: # 사이즈 검사
             raise ValueError(
                 "the sizes of the arrays don't match: {}, {}"
                 .format(n_ones.shape, n_zeros.shape)
             )
-        self.n_ones = n_ones
+        self.n_ones = n_ones 
         self.n_zeros = n_zeros
 
     @property
@@ -59,7 +59,7 @@ class Beta(RandomVariable):
     def shape(self):
         return self.n_ones.shape
 
-    def _pdf(self, mu):
+    def _pdf(self, mu): # pdf 함수
         return (
             gamma(self.n_ones + self.n_zeros)
             * np.power(mu, self.n_ones - 1)
@@ -68,7 +68,7 @@ class Beta(RandomVariable):
             / gamma(self.n_zeros)
         )
 
-    def _draw(self, sample_size=1):
+    def _draw(self, sample_size=1): # sampling
         return np.random.beta(
             self.n_ones, self.n_zeros, size=(sample_size,) + self.shape
         )
