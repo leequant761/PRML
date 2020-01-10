@@ -20,16 +20,16 @@ class SigmoidalFeature(object):
             coefficient to be multplied with the distance
         """
         if mean.ndim == 1:
-            mean = mean[:, None]
+            mean = mean[:, None] # n_features x 1
         else:
-            assert mean.ndim == 2
+            assert mean.ndim == 2 # 2차원 coordinate까지 지원
         if isinstance(coef, int) or isinstance(coef, float):
-            if np.size(mean, 1) == 1:
+            if np.size(mean, 1) == 1: # mean n_column이 1이라면(1차원 coordinate)
                 coef = np.array([coef])
-            else:
+            else: # 대신에 2차원인 경우 coef를 np.array로 넘겨줘야함
                 raise ValueError("mismatch of dimension")
         else:
-            assert coef.ndim == 1
+            assert coef.ndim == 1 # np.array로 들어왔을 때
             assert np.size(mean, 1) == len(coef)
         self.mean = mean
         self.coef = coef
@@ -56,7 +56,11 @@ class SigmoidalFeature(object):
         else:
             assert x.ndim == 2
         assert np.size(x, 1) == np.size(self.mean, 1)
-        basis = [np.ones(len(x))]
+        basis = [np.ones(len(x))] # bias term
         for m in self.mean:
             basis.append(self._sigmoid(x, m))
-        return np.asarray(basis).transpose()
+        return np.asarray(basis).transpose() # sample_size X n_features
+
+if __name__=='__main__':
+    X_sigmoidal = SigmoidalFeature(np.linspace(-1, 1, 11), 10).transform(np.array([1]))
+    X_sigmoidal2 = SigmoidalFeature(np.linspace(-1, 1, 12).reshape(-1, 2), np.array([10, 10]))#.transform(np.array([1]))

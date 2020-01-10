@@ -18,6 +18,10 @@ class EmpiricalBayesRegression(BayesianRegression):
 
     def __init__(self, alpha:float=1., beta:float=1.):
         super().__init__(alpha, beta)
+        # self.alpha = alpha # w의 prior 분산과 관련
+        # self.beta = beta # 회귀모형의 epsilon의 분산과 괸련
+        # self.w_mean = None # w의 posterior mean이 바인딩될 곳
+        # self.w_precision = None # w의 posterior variance가 바인딩될 곳
 
     def fit(self, X:np.ndarray, t:np.ndarray, max_iter:int=100):
         """
@@ -35,20 +39,20 @@ class EmpiricalBayesRegression(BayesianRegression):
         """
         M = X.T @ X
         eigenvalues = np.linalg.eigvalsh(M)
-        eye = np.eye(np.size(X, 1))
+        eye = np.eye(np.size(X, 1)) # D x D
         N = len(t)
         for _ in range(max_iter):
             params = [self.alpha, self.beta]
 
-            w_precision = self.alpha * eye + self.beta * X.T @ X
-            w_mean = self.beta * np.linalg.solve(w_precision, X.T @ t)
+            w_precision = self.alpha * eye + self.beta * X.T @ X # A ; 3.81
+            w_mean = self.beta * np.linalg.solve(w_precision, X.T @ t) # beta * S_N @ X.T @ t
 
             gamma = np.sum(eigenvalues / (self.alpha + eigenvalues))
-            self.alpha = float(gamma / np.sum(w_mean ** 2).clip(min=1e-10))
+            self.alpha = float(gamma / np.sum(w_mean ** 2).clip(min=1e-10)) # 1e-10 이하는 1e-10로 고정
             self.beta = float(
                 (N - gamma) / np.sum(np.square(t - X @ w_mean))
             )
-            if np.allclose(params, [self.alpha, self.beta]):
+            if np.allclose(params, [self.alpha, self.beta]): # 매우 차이가없으면
                 break
         self.w_mean = w_mean
         self.w_precision = w_precision
@@ -83,4 +87,4 @@ class EmpiricalBayesRegression(BayesianRegression):
         return 0.5 * (
             D * np.log(self.alpha) + N * np.log(self.beta)
             - np.linalg.slogdet(self.w_precision)[1] - D * np.log(2 * np.pi)
-        ) + self._log_posterior(X, t, self.w_mean)
+        ) + self._log_posterior(X, t, self.w_mean) # p(t| alpha, beta) ; 3.86

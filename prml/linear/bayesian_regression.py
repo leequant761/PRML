@@ -12,10 +12,10 @@ class BayesianRegression(Regression):
     """
 
     def __init__(self, alpha:float=1., beta:float=1.):
-        self.alpha = alpha
-        self.beta = beta
-        self.w_mean = None
-        self.w_precision = None
+        self.alpha = alpha # w의 prior 분산과 관련
+        self.beta = beta # 회귀모형의 epsilon의 분산과 괸련
+        self.w_mean = None # w의 posterior mean이 바인딩될 곳
+        self.w_precision = None # w의 posterior variance가 바인딩될 곳
 
     def _is_prior_defined(self) -> bool:
         return self.w_mean is not None and self.w_precision is not None
@@ -24,7 +24,7 @@ class BayesianRegression(Regression):
         if self._is_prior_defined():
             return self.w_mean, self.w_precision
         else:
-            return np.zeros(ndim), self.alpha * np.eye(ndim)
+            return np.zeros(ndim), self.alpha * np.eye(ndim) # 객체에서 처음 fit을 호출하면 초기의 prior를 준다
 
     def fit(self, X:np.ndarray, t:np.ndarray):
         """
@@ -38,9 +38,10 @@ class BayesianRegression(Regression):
             training data dependent variable
         """
 
-        mean_prev, precision_prev = self._get_prior(np.size(X, 1))
+        mean_prev, precision_prev = self._get_prior(np.size(X, 1)) # 이전의 posterior는 현재의 prior
 
-        w_precision = precision_prev + self.beta * X.T @ X
+        # posterior 구하기
+        w_precision = precision_prev + self.beta * X.T @ X 
         w_mean = np.linalg.solve(
             w_precision,
             precision_prev @ mean_prev + self.beta * X.T @ t
@@ -73,15 +74,17 @@ class BayesianRegression(Regression):
             samples from the predictive distribution
         """
 
-        if sample_size is not None:
+        if sample_size is not None: # 1. sampling mode
             w_sample = np.random.multivariate_normal(
                 self.w_mean, self.w_cov, size=sample_size
             )
             y_sample = X @ w_sample.T
             return y_sample
-        y = X @ self.w_mean
-        if return_std:
-            y_var = 1 / self.beta + np.sum(X @ self.w_cov * X, axis=1)
+        y = X @ self.w_mean # predictive mean
+        if return_std: # 2. distribution mode (mean & variance)
+            y_var = 1 / self.beta + np.sum(X @ self.w_cov * X, axis=1) # predictive variance
             y_std = np.sqrt(y_var)
             return y, y_std
         return y
+
+# TODO January 04, 2020: 챕터 3.3을 공부하고 주석달기
